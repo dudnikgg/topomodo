@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Sidebar from './layouts/Sidebar.vue';
-import Main from './layouts/Main.vue';
-import TodoItem from './components/Todo/TodoItem.vue'
+import Sidebar from './views/Sidebar.vue';
+import Main from './views/Main.vue';
 </script>
 
 <template>
@@ -9,6 +8,10 @@ import TodoItem from './components/Todo/TodoItem.vue'
   <Main />
 </template>
 
-<style scoped>
-
+<style>
+#l-app {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100vh;
+}
 </style>
