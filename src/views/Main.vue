@@ -14,4 +14,8 @@
 
     padding: var(--t-paddings);
 }
+
+.l-main__title {
+    margin-top: 0;
+}
 </style>

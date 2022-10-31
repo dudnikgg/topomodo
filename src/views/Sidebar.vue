@@ -8,9 +8,9 @@ import TodoList from '@/components/Todo/TodoList.vue'
 </template>
 <style scoped lang="scss">
 #l-sidebar {
-  flex-basis: 30rem;
+  flex-basis: 40rem;
   flex-grow: 1;
-  background-color: var(--t-dark);
+  background-color: var(--t-dark-secondary);
 
   padding: var(--t-paddings);
 }

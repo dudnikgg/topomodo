@@ -12,7 +12,7 @@ describe("TodoItem.vue test", () => {
         done: false,
       },
     })
-    wrapper.find("button[data-test='toggleTodo']").trigger("click")
+    wrapper.find("input[data-test='toggleTodo']").trigger("click")
 
     expect(wrapper.emitted("toggleTodo")).toHaveLength(1)
     expect(wrapper.emitted("toggleTodo")[0]).toEqual([1, true])
@@ -24,7 +24,7 @@ describe("TodoItem.vue test", () => {
         done: true,
       },
     })
-    wrapper2.find("button[data-test='toggleTodo']").trigger("click")
+    wrapper2.find("input[data-test='toggleTodo']").trigger("click")
 
     expect(wrapper2.emitted("toggleTodo")).toHaveLength(1)
     expect(wrapper2.emitted("toggleTodo")[0]).toEqual([1, false])

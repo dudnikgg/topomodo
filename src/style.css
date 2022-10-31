@@ -1,17 +1,35 @@
 @import "normalize.css";
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500;700&display=swap");
 
 :root {
   --t-dark: #121212;
-  --t-dark-primary: #212121;
-  --t-dark-secondary: #9e9e9d;
-  --t-dark-tertiary: #5c5b5b;
-  --t-dark-accent: #45b786;
-  --t-dark-accent-secondary: #079447;
+  --t-dark-white: #f8f8f2;
+  --t-dark-grey: #414558;
+  --t-dark-cyan: #80ffea;
+  --t-dark-green: #8aff80;
+  --t-dark-red: #ff9580;
+  --t-dark-yellow: #ffff80;
+  --t-dark-cyan-green: linear-gradient(
+    136.23deg,
+    var(--t-dark-cyan) -2.25%,
+    var(--t-dark-green) 100%
+  );
+  --t-dark-primary: #22212c;
+  --t-dark-secondary: #282a36;
+  --t-dark-tertiary: #9ca3c9;
 
   /* paddings/margins */
   --t-paddings: 2rem;
 
+  /* borders */
+  --t-border-width: 3px;
+  --t-border-style: solid;
+  --t-border-color: var(--t-dark-tertiary);
+  --t-border-color--active: var(--t-dark-green);
+  --t-border-radius: 12px;
+
+  /* transion for elements */
+  --t-transition: all 250ms cubic-bezier(0.4, 0, 0.23, 1);
 }
 
 html {
@@ -25,11 +43,16 @@ html {
 
 a {
   font-weight: 500;
-  color: var(--t-dark-accent-secondary-color);
+  color: var(--t-dark-cyan);
   text-decoration: inherit;
 }
 a:hover {
-  color: var(--t-dark-accent-color);
+  color: var(--t-dark-green);
+}
+
+html,
+body {
+  font-size: 16px;
 }
 
 body {
@@ -38,12 +61,174 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 5rem;
+  font-size: 80px;
+  line-height: 105px;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 3.75rem;
+  font-size: 60px;
+  line-height: 80px;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.875rem;
+  font-size: 30px;
+  line-height: 40px;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.5rem;
+  font-size: 24px;
+  line-height: 31px;
+  font-weight: 600;
+}
+
+button,
+.c-btn {
+  border: var(--t-border-width) var(--t-border-style) var(--t-border-color);
+  border-radius: var(--t-border-radius);
+  box-shadow: none;
+  cursor: pointer;
+  outline-color: var(--t-dark-green);
+}
+
+.c-btn--icon {
+  border: none;
+  background-color: transparent;
+  padding: 0;
+}
+
+.c-btn--icon svg {
+  fill: var(--t-dark-tertiary);
+}
+
+button:hover,
+.c-btn:hover {
+  border-color: var(--t-dark-green);
+}
+
+.c-input {
+  background-color: transparent;
+  border-radius: var(--t-border-radius);
+  border: var(--t-border-width) var(--t-border-style) var(--t-border-color);
+
+  flex: 1 1 100%;
+  font-size: 1.25rem;
+  font-size: 20px;
+  height: 67px;
+}
+
+.c-input::placeholder {
+  color: var(--t-dark-tertiary);
+}
+
+.c-input:focus,
+.c-input:focus-visible {
+  outline-offset: -3px; /* to avoid the border to be cut */
+  outline: var(--t-border-width) var(--t-border-style) var(--t-dark-green);
+}
+
+.c-input.c-input--checkbox {
+  display: none;
+}
+
+.c-input.c-input--checkbox + label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0.6em 0;
+  color: var(--t-dark-tertiary);
+  cursor: pointer;
+  transition: text-decoration 250ms cubic-bezier(0.4, 0, 0.23, 1);
+}
+
+.c-input.c-input--checkbox + label > span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1em;
+  width: calc(31px - var(--t-border-width) * 2); /* 31px minus borders */
+  height: calc(30px - var(--t-border-width) * 2); /* 30px minus borders */
+  background: transparent;
+  border: var(--t-border-width) var(--t-border-style) var(--t-border-color);
+  border-radius: calc(var(--t-border-radius) / 1.2);
+  cursor: pointer;
+  transition: var(--t-transition);
+}
+
+.c-input.c-input--checkbox + label:hover,
+.c-input.c-input--checkbox:focus + label {
+  color: var(--t-dark-white);
+}
+
+.c-input.c-input--checkbox + label:hover > span,
+.c-input.c-input--checkbox:focus + label > span {
+  background: var(--t-dark-grey);
+}
+
+.c-input.c-input--checkbox.js-checked + label {
+  text-decoration: line-through;
+}
+
+.c-input.c-input--checkbox.js-checked + label > span {
+  background-color: var(--t-border-color--active);
+  border: var(--t-border-width) var(--t-border-style)
+    var(--t-border-color--active);
+  animation: shrink-bounce 200ms cubic-bezier(0.4, 0, 0.23, 1);
+}
+
+.c-input.c-input--checkbox.js-checked + label > span::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  left: 8px;
+  border-right: 2px var(--t-border-style) transparent;
+  border-bottom: 3px var(--t-border-style) transparent;
+  transform: rotate(70deg);
+  transform-origin: 0% 100%;
+  animation: checkbox-check 125ms 250ms cubic-bezier(0.4, 0, 0.23, 1) forwards;
+  font-size: 24px;
+}
+
+@keyframes shrink-bounce {
+  0% {
+    transform: scale(1);
+  }
+  33% {
+    transform: scale(0.85);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes checkbox-check {
+  0% {
+    width: 0;
+    height: 0;
+    border-color: var(--t-dark);
+    transform: translate3d(0, 0, 0) rotate(45deg);
+  }
+  33% {
+    width: 0.2em;
+    height: 0;
+    transform: translate3d(0, 0, 0) rotate(45deg);
+  }
+  100% {
+    width: 0.2em;
+    height: 0.5em;
+    border-color: var(--t-dark);
+    transform: translate3d(0, -0.5em, 0) rotate(45deg);
+  }
 }
 
 /* button {
-  border-radius: 8px;
+
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
