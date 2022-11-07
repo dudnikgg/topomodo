@@ -2,8 +2,8 @@
 
 </script>
 <template>
-    <div class="l-main">
-        <h1 class="l-main__title">Main</h1>
+    <div id="main" class="l-main">
+        <h1>Main</h1>
         <!-- <Pomodoro /> -->
     </div>
 </template>
@@ -15,7 +15,7 @@
     padding: var(--t-paddings);
 }
 
-.l-main__title {
+.l-main h1 {
     margin-top: 0;
 }
 </style>

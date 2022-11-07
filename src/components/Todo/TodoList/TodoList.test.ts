@@ -1,7 +1,7 @@
 import { shallowMount } from "@vue/test-utils";
 import { expect, it, describe } from "vitest";
 
-import TodoList from "./TodoList.vue";
+import TodoList from "@/components/ToDo/TodoList/TodoList.vue";
 
 describe("TodoList.vue test", () => {
     it("Shows add todo input and button", () => {
@@ -15,7 +15,7 @@ describe("TodoList.vue test", () => {
         const button = wrapper.find('button[data-test="addTodo"]');
 
         expect(button.attributes("disabled")).toBeDefined();
-        await input.setValue("todo2");
+        await input.setValue("todo");
         expect(button.attributes("disabled")).toBeUndefined();
     })
 
@@ -23,35 +23,25 @@ describe("TodoList.vue test", () => {
         const wrapper = Wrapper(TodoList);
         const input = wrapper.get('input[type="text"]');
         const button = wrapper.get('button[data-test="addTodo"]');
-        await input.setValue("todo2");
+        await input.setValue("todo");
         await button.trigger("click");
 
-        expect(wrapper.findAll("[data-test='todoItem']")).toHaveLength(1)
+        expect(wrapper.findAll("[data-test='todoItem']")).toHaveLength(2)
 
         expect(input.text()).toBe("");
     })
 
     it("Adds new todo when enter pressed and clears input", async () => {
         const wrapper = Wrapper(TodoList);
-        const input = wrapper.get('input[type="text"]');
-        await input.setValue("todo2");
-        await input.trigger("keyup.enter");
+        const form = wrapper.get('form[data-test="addTodoForm"]');
+        const input = form.get('input[type="text"]');
+        await input.setValue("todo");
+        await form.trigger("submit.prevent");
 
-        expect(wrapper.findAll("[data-test='todoItem']")).toHaveLength(1)
+        expect(wrapper.findAll("[data-test='todoItem']")).toHaveLength(2)
 
         expect(input.text()).toBe("");
     })
-
-    // it("Removes todo from todoList when remove button clicked", async () => {
-    //     const wrapper = Wrapper(TodoList);
-    //     const input = wrapper.find('input[type="text"]');
-    //     const button = wrapper.find('button[data-test="removeTodo"]');
-    //     await input.setValue("todo2");
-    //     await button.trigger("click");
-    //     const removeButton = wrapper.find('button[data-test="removeTodo"]');
-    //     await removeButton.trigger("click");
-    //     expect(wrapper.vm.$.setupState.todos.length).toBe(0);
-    // })
 });
 
 function Wrapper(props: object) {

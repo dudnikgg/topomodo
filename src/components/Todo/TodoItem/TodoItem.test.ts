@@ -1,7 +1,7 @@
 import { shallowMount } from "@vue/test-utils"
 import { expect, it, describe } from "vitest"
 
-import TodoItem from "./TodoItem.vue"
+import TodoItem from "@/components/ToDo/TodoItem/TodoItem.vue"
 
 describe("TodoItem.vue test", () => {
   it("Toggle todo done/not done", async () => {
@@ -38,25 +38,25 @@ describe("TodoItem.vue test", () => {
         done: false,
       },
     })
-    wrapper.find("button[data-test='removeTodo']").trigger("click")
+    wrapper.find("[data-test='removeTodo']").trigger("click")
 
     expect(wrapper.emitted("removeTodo")).toHaveLength(1)
   })
 
-  it("Emits a pomodoro event (pomodoros estimate) with todo id", async () => {
-    const wrapper = Wrapper({
-      todo: {
-        id: 1,
-        text: "todo1",
-        done: false,
-        pomodoros: 3
-      }
-    })
+  // it("Emits a pomodoro event (pomodoros estimate) with todo id", async () => {
+  //   const wrapper = Wrapper({
+  //     todo: {
+  //       id: 1,
+  //       text: "todo1",
+  //       done: false,
+  //       pomodoros: 3
+  //     }
+  //   })
 
-    wrapper.find("button[data-test='pomodorosTodo']").trigger("click")
+  //   wrapper.find("button[data-test='pomodorosTodo']").trigger("click")
 
-    expect(wrapper.emitted("pomodorosTodo")).toHaveLength(1)
-  })
+  //   expect(wrapper.emitted("pomodorosTodo")).toHaveLength(1)
+  // })
 })
 
 function Wrapper(props: object) {

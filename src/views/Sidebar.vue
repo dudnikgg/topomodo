@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import TodoList from '@/components/Todo/TodoList.vue'
+import TodoList from '@/components/Todo/TodoList/TodoList.vue'
 </script>
 <template>
-  <div id="l-sidebar">
+  <div id="sidebar">
     <TodoList />
   </div>
 </template>
 <style scoped lang="scss">
-#l-sidebar {
+#sidebar {
   flex-basis: 40rem;
   flex-grow: 1;
   background-color: var(--t-dark-secondary);

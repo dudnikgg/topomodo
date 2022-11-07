@@ -4,3 +4,5 @@ export interface ITodoItem {
   done: boolean
   pomodoros?: number
 }
+
+export const MAX_POMODOROS = 5
