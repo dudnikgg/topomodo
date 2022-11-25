@@ -18,6 +18,7 @@ const addNewTodo = () => {
         const newTodoItem: ITodoItem = {
             id: uniqeId(),
             text: newTodoText.value,
+            pomodoros: 1,
             done: false
         }
         todos.push(newTodoItem)
@@ -44,31 +45,31 @@ const setPomodorosTodo = (id: string, pomodoros: number) => {
 </script>
 <template>
     <div class="todo">
-        <h3 class="todo__title">Tasks - {{ todos.length }}:</h3>
-        <form class="todo__form" @submit.prevent="addNewTodo" data-test="addTodoForm">
-            <button type="submit" class="todo__add iconButton" :disabled="!newTodoText" @click.prevent="addNewTodo" data-test="addTodo">
+        <h3 class="todo-title">Tasks - {{ todos.length }}:</h3>
+        <form class="todo-form" @submit.prevent="addNewTodo" data-test="addTodoForm">
+            <button type="submit" class="todo-icon" :disabled="!newTodoText" @click.prevent="addNewTodo" data-action="submit" data-test="addTodo">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <use xlink:href="/all.svg#gg-math-plus" />
                 </svg>
             </button>
-            <input type="text" class="todo__input" placeholder="Add todo..." v-model="newTodoText" />
+            <input type="text" data-action="submit" placeholder="Add todo..." v-model="newTodoText" />
         </form>
-        <div class="todo__list">
+        <div class="todo-list">
             <TodoItem v-for="todo in todos" :key="todo.id" :todo="todo" @set-pomodoros-todo="setPomodorosTodo" @remove-todo="removeTodo" @toggle-todo="toggleTodo" data-test="todoItem" />
         </div>
     </div>
 </template>
 <style scoped>
-.todo__form {
+.todo-form {
     display: flex;
     position: relative;
 }
 
-.todo__input {
+.todo input[data-action="submit"] {
     padding-left: 3em;
 }
 
-.todo__add {
+.todo button[data-action="submit"] {
     position: absolute;
     left: 0.7em;
     top: 50%;
@@ -84,7 +85,7 @@ const setPomodorosTodo = (id: string, pomodoros: number) => {
     align-items: center;
 }
 
-.todo__add > svg {
+.todo button[data-action="submit"] > svg {
     width: 15px;
     height: 15px;
     color: var(--t-dark);

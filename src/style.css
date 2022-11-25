@@ -42,15 +42,6 @@ html {
   background-color: var(--t-dark-primary);
 }
 
-a {
-  font-weight: 500;
-  color: var(--t-dark-cyan);
-  text-decoration: inherit;
-}
-a:hover {
-  color: var(--t-dark-green);
-}
-
 html,
 body {
   font-size: 16px;
@@ -87,6 +78,15 @@ h4 {
   font-size: 24px;
   line-height: 31px;
   font-weight: 600;
+}
+
+a {
+  font-weight: 500;
+  color: var(--t-dark-cyan);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--t-dark-green);
 }
 
 input:not([type="checkbox"]),

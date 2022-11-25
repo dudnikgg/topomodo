@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import type { ITodoItem } from '@/types/TodoItem'
-import { MAX_POMODOROS } from '@/types/TodoItem'
+import Pomodoros from '@/components/Pomodoros/Pomodoros.vue'
 const { todo } = defineProps<{
     todo: ITodoItem
 }>()
@@ -17,98 +17,71 @@ const emitTodoToggle = (todoId: string, isDone: boolean) => { console.log('asdas
 const emitTodoRemove = (todoId: string) => { emit('removeTodo', todoId) }
 const emitTodoSetPomodoros = (todoId: string, pomodoros: number) => { emit('setPomodorosTodo', todoId, pomodoros) }
 
-const pomodorosItems = ref([])
-
-const pomodorosOnMouseover = (hoveredPomodoros: number) => {
-    pomodorosItems.value.forEach((pomodoroItem: HTMLElement, index: number) => {
-        if (index + 1 <= hoveredPomodoros) {
-            pomodoroItem.classList.add('js-hovered')
-        } else {
-            pomodoroItem.classList.remove('js-hovered')
-        }
-    })
-}
 </script>
+
 <template>
-    <div class="todo__item">
-        <div class="todo__item--top">
-            <div class="todo__checkbox-wrapper">
-                <input type="checkbox" :id="`todoCheckbox-${todo.id}`" @click="emitTodoToggle(todo.id, !todo.done)" :class="{ 'js-checked': todo.done }"
-                    data-test="toggleTodo" />
-                <label :for='`todoCheckbox-${todo.id}`' class="todo__text">
-                    <span></span>
-                    {{ todo.text }}
-                </label>
-            </div>
-            <button type="button" class="todo__delete iconButton" @click.prevent="emitTodoRemove(todo.id)" data-test="removeTodo">
-                <svg>
-                    <use xlink:href="/all.svg#gg-trash" />
-                </svg>
-            </button>
-        </div>
-        <div class="todo__item--bottom">
-            <div class="pomodoros">
-                <div class="pomodoros__item" v-for="index in MAX_POMODOROS" :key="index + 1">
-                    <button type="button" class="iconButton">
-                        <svg ref="pomodorosItems" :class="{ 'js-checked': todo.pomodoros && todo.pomodoros >= index }" @mouseover="pomodorosOnMouseover(index)"
-                            @click="emitTodoSetPomodoros(todo.id, index)">
-                            <use xlink:href="/tomato.svg#tomato" />
-                        </svg>
-                    </button>
+    <div class="todo-item">
+        <div class="l-inner">
+            <div class="l-todo-top">
+                <div class="l-wrapper">
+                    <input type="checkbox" :id="`todoCheckbox-${todo.id}`" @click="emitTodoToggle(todo.id, !todo.done)" :class="{ 'js-checked': todo.done }"
+                        data-test="toggleTodo" />
+                    <label :for='`todoCheckbox-${todo.id}`' class="todo-text">
+                        <span></span>
+                        {{ todo.text }}
+                    </label>
                 </div>
             </div>
+            <div class="l-todo-bottom">
+                <button type="button" class="todo-plan" data-action="planTodo">Plan ToDo</button>
+                <div class="todo-date">
+                    <button type="button" data-action="todoDate">Date</button>
+                </div>
+
+                <Pomodoros :pomodoros="todo.pomodoros" @set-pomodoros="emitTodoSetPomodoros(todo.id, $event)"/>
+            </div>
         </div>
+        <button type="button" @click.prevent="emitTodoRemove(todo.id)" data-action="removeTodo" data-test="removeTodo">
+            <svg viewBox="0 0 20 20" preserveAspectRatio="none" width="30" height="30">
+                <use xlink:href="/all.svg#gg-trash" />
+            </svg>
+        </button>
     </div>
 </template>
 <style scoped>
-.todo__item {
+.todo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     background-color: var(--t-dark-grey);
     border-radius: var(--t-border-radius);
     margin: 20px 0;
     padding: 0.5em 1em;
 }
 
-.todo__item--top {
+.todo .l-inner {
+    flex: 1;
+}
+
+.l-todo-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.todo__item--bottom {
+.l-todo-bottom {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 1em;
     padding-left: 50px;
 }
 
-.todo__delete>svg {
-    width: 30px;
-    height: 30px;
+.todo button[data-action="removeTodo"] {
+    background-color: transparent;
+    border: none;
 }
 
-.todo__delete:hover>svg {
+.todo button[data-action="removeTodo"]:hover>svg {
     color: var(--t-dark-red);
-}
-
-.pomodoros {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 5px;
-}
-
-.pomodoros svg {
-    width: 15px;
-    height: 15px;
-    filter: grayscale(100%);
-    cursor: pointer;
-}
-
-.pomodoros svg.js-hovered {
-    filter: grayscale(50%);
-}
-
-.pomodoros svg.js-checked {
-    filter: grayscale(0%);
 }
 </style>

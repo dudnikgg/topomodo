@@ -6,7 +6,7 @@ import TodoList from '@/components/Todo/TodoList/TodoList.vue'
     <TodoList />
   </div>
 </template>
-<style scoped lang="scss">
+<style scoped>
 #sidebar {
   flex-basis: 40rem;
   flex-grow: 1;
