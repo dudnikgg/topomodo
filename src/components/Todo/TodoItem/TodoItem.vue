@@ -1,31 +1,41 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { useTodoStore } from '@/stores/TodoStore';
+import { useActiveTodoStore } from '@/stores/ActiveTodoStore';
 import type { ITodoItem } from '@/types/TodoItem'
 import Pomodoros from '@/components/Pomodoros/Pomodoros.vue'
 const { todo } = defineProps<{
     todo: ITodoItem
 }>()
 
-// TODO: Should be in the store
-const emit = defineEmits<{
-    (event: 'toggleTodo', ...args: Parameters<(id: string, isDone: boolean) => void>): void
-    (event: 'removeTodo', ...args: Parameters<(id: string) => void>): void
-    (event: 'setPomodorosTodo', ...args: Parameters<(id: string, pomodoros: number) => void>): number
-}>()
+const todoStore = useTodoStore();
+const activeTodoStore = useActiveTodoStore();
+const todoRef = ref()
 
-const emitTodoToggle = (todoId: string, isDone: boolean) => { console.log('asdasd'); emit('toggleTodo', todoId, isDone) }
-const emitTodoRemove = (todoId: string) => { emit('removeTodo', todoId) }
-const emitTodoSetPomodoros = (todoId: string, pomodoros: number) => { emit('setPomodorosTodo', todoId, pomodoros) }
+const pomodorosOnMouseover = (hoveredPomodoros: number) => {
+    todoRef.value.querySelectorAll(".pomodoros-item > svg").forEach((pomodoroItem: HTMLElement, index: number) => {
+        if (index + 1 <= hoveredPomodoros) {
+            pomodoroItem.classList.add('js-hovered')
+        } else {
+            pomodoroItem.classList.remove('js-hovered')
+        }
+    })
+}
 
+const pomodorosOnMouseout = () => {
+    todoRef.value.querySelectorAll(".pomodoros-item > svg").forEach((pomodoroItem: HTMLElement) => {
+        pomodoroItem.classList.remove('js-hovered')
+    })
+}
 </script>
 
 <template>
-    <div class="todo-item">
+    <div class="todo-item" ref="todoRef">
         <div class="l-inner">
             <div class="l-todo-top">
                 <div class="l-wrapper">
-                    <input type="checkbox" :id="`todoCheckbox-${todo.id}`" @click="emitTodoToggle(todo.id, !todo.done)" :class="{ 'js-checked': todo.done }"
-                        data-test="toggleTodo" />
+                    <input type="checkbox" :id="`todoCheckbox-${todo.id}`" @click="todoStore.toggleTodoItemStatus(todo.id, !todo.done)"
+                        :class="{ 'js-checked': todo.done }" data-test="toggleTodo" />
                     <label :for='`todoCheckbox-${todo.id}`' class="todo-text">
                         <span></span>
                         {{ todo.text }}
@@ -33,15 +43,16 @@ const emitTodoSetPomodoros = (todoId: string, pomodoros: number) => { emit('setP
                 </div>
             </div>
             <div class="l-todo-bottom">
-                <button type="button" class="todo-plan" data-action="planTodo">Plan ToDo</button>
+                <button type="button" class="todo-start" @click="activeTodoStore.setActiveTodoItem(todo)">Start</button>
                 <div class="todo-date">
                     <button type="button" data-action="todoDate">Date</button>
                 </div>
 
-                <Pomodoros :pomodoros="todo.pomodoros" @set-pomodoros="emitTodoSetPomodoros(todo.id, $event)"/>
+                <Pomodoros :pomodoros="todo.pomodoros" @set-pomodoros="todoStore.setPomodorosTodoItem(todo.id, $event)" @on-mouseout="pomodorosOnMouseout"
+                    @on-mouseover="pomodorosOnMouseover" />
             </div>
         </div>
-        <button type="button" @click.prevent="emitTodoRemove(todo.id)" data-action="removeTodo" data-test="removeTodo">
+        <button type="button" @click.prevent="todoStore.removeTodoItem(todo.id)" data-action="removeTodo" data-test="removeTodo">
             <svg viewBox="0 0 20 20" preserveAspectRatio="none" width="30" height="30">
                 <use xlink:href="/all.svg#gg-trash" />
             </svg>

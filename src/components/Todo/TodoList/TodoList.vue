@@ -1,51 +1,28 @@
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import uniqeId from 'uniqid';
-
+import { ref } from 'vue';
+import { useTodoStore } from '@/stores/TodoStore';
 import TodoItem from '@/components/Todo/TodoItem/TodoItem.vue'
-import type { ITodoItem } from '@/types/TodoItem'
-const todos: Array<ITodoItem> = reactive([{
-    id: uniqeId(),
-    text: 'TODO 1',
-    done: false,
-    pomodoros: 2
-}])
+import uniqeId from "uniqid"
+
+const todoStore = useTodoStore();
 
 const newTodoText = ref('')
 
 const addNewTodo = () => {
     if (newTodoText) {
-        const newTodoItem: ITodoItem = {
+        todoStore.addTodoItem({
             id: uniqeId(),
             text: newTodoText.value,
-            pomodoros: 1,
-            done: false
-        }
-        todos.push(newTodoItem)
+            done: false,
+            pomodoros: 2,
+        });
         newTodoText.value = ''
     }
-
 }
-
-const toggleTodo = (id: string, isDone: boolean) => {
-    const index = todos.findIndex(todo => todo.id === id)
-    todos[index].done = isDone
-}
-
-const removeTodo = (id: string) => {
-    const index = todos.findIndex(todo => todo.id === id)
-    todos.splice(index, 1)
-}
-
-const setPomodorosTodo = (id: string, pomodoros: number) => {
-    const index = todos.findIndex(todo => todo.id === id)
-    todos[index].pomodoros = pomodoros
-}
-
 </script>
 <template>
     <div class="todo">
-        <h3 class="todo-title">Tasks - {{ todos.length }}:</h3>
+        <h3 class="todo-title">Tasks - {{ todoStore.todos.length }}:</h3>
         <form class="todo-form" @submit.prevent="addNewTodo" data-test="addTodoForm">
             <button type="submit" class="todo-icon" :disabled="!newTodoText" @click.prevent="addNewTodo" data-action="submit" data-test="addTodo">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -55,7 +32,7 @@ const setPomodorosTodo = (id: string, pomodoros: number) => {
             <input type="text" data-action="submit" placeholder="Add todo..." v-model="newTodoText" />
         </form>
         <div class="todo-list">
-            <TodoItem v-for="todo in todos" :key="todo.id" :todo="todo" @set-pomodoros-todo="setPomodorosTodo" @remove-todo="removeTodo" @toggle-todo="toggleTodo" data-test="todoItem" />
+            <TodoItem v-for="todo in todoStore.todos" :key="todo.id" :todo="todo" data-test="todoItem" />
         </div>
     </div>
 </template>
@@ -85,7 +62,7 @@ const setPomodorosTodo = (id: string, pomodoros: number) => {
     align-items: center;
 }
 
-.todo button[data-action="submit"] > svg {
+.todo button[data-action="submit"]>svg {
     width: 15px;
     height: 15px;
     color: var(--t-dark);

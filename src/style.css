@@ -184,7 +184,7 @@ input[type="checkbox"].js-checked + label > span::before {
   top: 13px;
   left: 8px;
   border-right: 2px var(--t-border-style) transparent;
-  border-bottom: 3px var(--t-border-style) transparent;
+  border-bottom: 2px var(--t-border-style) transparent;
   transform: rotate(70deg);
   transform-origin: 0% 100%;
   animation: checkbox-check 125ms 250ms cubic-bezier(0.4, 0, 0.23, 1) forwards;
