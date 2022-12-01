@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "vite & vitest",
     "dev": "vite",
+    "test": "vitest",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },

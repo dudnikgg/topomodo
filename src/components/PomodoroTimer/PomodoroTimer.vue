@@ -1,13 +1,18 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import { useActiveTodoStore } from "@/stores/ActiveTodoStore";
-import RadialProgressBar from "~/vue3-radial-progress";
 import Pomodoros from "../Pomodoros/Pomodoros.vue";
 
+// Async CircleProgress component
+const circleProgress = defineAsyncComponent(() =>
+  import('../CircleProgress.vue')
+)
 const activeTodoStore = useActiveTodoStore();
 
 let pomodorosIntervalId: ReturnType<typeof setInterval>;
 let counter = ref(0);
+let staticCounterValue = ref(0);
+let counterCompletedSteps = ref(counter.value);
 
 const prettyTime = computed<string>(() => {
   const minutes = Math.floor(counter.value / 60);
@@ -18,15 +23,18 @@ const prettyTime = computed<string>(() => {
 
 activeTodoStore.$subscribe(() => {
   let pomodoros = activeTodoStore.activeTodo?.pomodoros ?? 0;
-  counter.value = pomodoros * 1 * 1;
+  // TODO: change to *25*60
+  counter.value = pomodoros * 25 * 60;
+  staticCounterValue.value = counter.value;
 });
 
 const startTimer = (target: HTMLButtonElement) => {
   target.dataset.action = "stopTimer"
   target.textContent = "Stop"
   pomodorosIntervalId = setInterval(() => {
-    if(counter.value > 0) {
+    if (counter.value > 0) {
       counter.value -= 1;
+      counterCompletedSteps.value = staticCounterValue.value - counter.value;
     } else {
       stopTimer(target);
     }
@@ -52,21 +60,21 @@ const toggleTimer = (event: Event) => {
 
 <template>
   <div class="timer">
-    <radial-progress-bar :diameter="500" :completed-steps="0" :total-steps="activeTodoStore.activeTodo.pomodoros">
+    <circle-progress :diameter="500" :segments="activeTodoStore.activeTodo.pomodoros">
       <div class="timer-content">
         <h4 class="timer-title">
           <template v-if="activeTodoStore.activeTodo.text">
             {{ activeTodoStore.activeTodo.text }}
           </template>
           <template v-else>
-            Start doing your task!
+            Plan Your Task!
           </template>
         </h4>
-        <time>{{prettyTime}}</time>
+        <time>{{ prettyTime }}</time>
         <Pomodoros :pomodoros="activeTodoStore.activeTodo.pomodoros" />
+        <button type="button" class="timer-btn" data-action="startTimer" @click="toggleTimer($event)">Start</button>
       </div>
-      <button type="button" class="timer-btn" data-action="startTimer" @click="toggleTimer($event)">Start</button>
-    </radial-progress-bar>
+    </circle-progress>
   </div>
 </template>
 
@@ -80,6 +88,10 @@ const toggleTimer = (event: Event) => {
 }
 
 .timer-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -114,5 +126,9 @@ const toggleTimer = (event: Event) => {
   font-size: 5em;
   margin-top: 0;
   margin-bottom: calc(var(--t-paddings) / 2);
+}
+
+.timer-btn {
+  margin-top: 40px;
 }
 </style>
