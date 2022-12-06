@@ -14,7 +14,11 @@ const addNewTodo = () => {
             id: uniqeId(),
             text: newTodoText.value,
             done: false,
-            pomodoros: 2,
+            pomodoros: {
+                count: 1,
+                inSeconds: 1500,
+                completedInSeconds: 0
+            },
         });
         newTodoText.value = ''
     }

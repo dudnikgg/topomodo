@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useTodoStore } from '@/stores/TodoStore';
+import useTimer from "@/composables/useTimer";
 import { useActiveTodoStore } from '@/stores/ActiveTodoStore';
 import type { ITodoItem } from '@/types/TodoItem'
 import Pomodoros from '@/components/Pomodoros/Pomodoros.vue'
@@ -30,7 +31,7 @@ const pomodorosOnMouseout = () => {
 </script>
 
 <template>
-    <div class="todo-item" ref="todoRef">
+    <div class="todo-item" ref="todoRef" :class="{ 'js-active': activeTodoStore.activeTodo.id === todo.id }" @click="activeTodoStore.toggleActiveTodoItem($event, todo)">
         <div class="l-inner">
             <div class="l-todo-top">
                 <div class="l-wrapper">
@@ -42,17 +43,16 @@ const pomodorosOnMouseout = () => {
                     </label>
                 </div>
             </div>
-            <div class="l-todo-bottom">
-                <button type="button" class="todo-start" @click="activeTodoStore.setActiveTodoItem(todo)">Start</button>
+            <div class="l-todo-bottom" :class="{ 'is-disabled': activeTodoStore.activeTodo.id === todo.id || todo.done }">
                 <div class="todo-date">
-                    <button type="button" data-action="todoDate">Date</button>
+                    <button type="button" class="todo-estimate btn--asLink">Estimate</button>
                 </div>
 
-                <Pomodoros :pomodoros="todo.pomodoros" @set-pomodoros="todoStore.setPomodorosTodoItem(todo.id, $event)" @on-mouseout="pomodorosOnMouseout"
-                    @on-mouseover="pomodorosOnMouseover" />
+                <Pomodoros :pomodoros-count="todo.pomodoros.count" @set-pomodoros="todoStore.setPomodorosTodoItem(todo.id, $event)"
+                    @on-mouseout="pomodorosOnMouseout" @on-mouseover="pomodorosOnMouseover" />
             </div>
         </div>
-        <button type="button" @click.prevent="todoStore.removeTodoItem(todo.id)" data-action="removeTodo" data-test="removeTodo">
+        <button type="button" class="todo-remove" @click.prevent.stop="todoStore.removeTodoItem(todo.id)" data-test="removeTodo">
             <svg viewBox="0 0 20 20" preserveAspectRatio="none" width="30" height="30">
                 <use xlink:href="/all.svg#gg-trash" />
             </svg>
@@ -65,9 +65,15 @@ const pomodorosOnMouseout = () => {
     align-items: center;
     justify-content: space-between;
     background-color: var(--t-dark-grey);
+    border: var(--t-border-width) var(--t-border-style) transparent;
     border-radius: var(--t-border-radius);
     margin: 20px 0;
     padding: 0.5em 1em;
+    cursor: pointer;
+}
+
+.todo-item.js-active {
+    border: var(--t-border-width) var(--t-border-style) var(--t-dark-green);
 }
 
 .todo .l-inner {
@@ -84,15 +90,24 @@ const pomodorosOnMouseout = () => {
     display: flex;
     align-items: center;
     gap: 1em;
-    padding-left: 50px;
+    padding-left: 45px;
 }
 
-.todo button[data-action="removeTodo"] {
+.l-todo-bottom.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.todo-remove {
     background-color: transparent;
     border: none;
 }
 
-.todo button[data-action="removeTodo"]:hover>svg {
+.todo-remove:hover>svg {
     color: var(--t-dark-red);
 }
+
+/* .todo-plan.btn--asLink {
+
+} */
 </style>

@@ -9,7 +9,31 @@ const useTodoStore = defineStore("todoStore", {
         id: uniqeId(),
         text: "TODO 1",
         done: false,
-        pomodoros: 2,
+        pomodoros: {
+          count: 4,
+          inSeconds: 6000,
+          completedInSeconds: 0,
+        },
+      },
+      {
+        id: uniqeId(),
+        text: "TODO 2",
+        done: true,
+        pomodoros: {
+          count: 4,
+          inSeconds: 6000,
+          completedInSeconds: 0,
+        },
+      },
+      {
+        id: uniqeId(),
+        text: "TODO 3",
+        done: false,
+        pomodoros: {
+          count: 4,
+          inSeconds: 6000,
+          completedInSeconds: 0,
+        },
       },
     ] as Array<ITodoItem>,
   }),
@@ -36,7 +60,9 @@ const useTodoStore = defineStore("todoStore", {
 
     setPomodorosTodoItem(id: string, pomodoros: number) {
       const index = this.todos.findIndex((todo) => todo.id === id)
-      this.todos[index].pomodoros = pomodoros
+      this.todos[index].pomodoros.count = pomodoros
+      // TODO: * 25 * 60
+      this.todos[index].pomodoros.inSeconds = pomodoros + 10
     },
   },
 })

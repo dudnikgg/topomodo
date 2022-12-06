@@ -1,78 +1,62 @@
 <script lang="ts" setup>
-import { ref, computed, defineAsyncComponent } from "vue";
-import { useActiveTodoStore } from "@/stores/ActiveTodoStore";
-import Pomodoros from "../Pomodoros/Pomodoros.vue";
+import { defineAsyncComponent, computed, watch } from "vue";
+import { useActiveTodoStore } from "@/stores/ActiveTodoStore"
+import useTimer from "@/composables/useTimer";
+import Pomodoros from "@/components/Pomodoros/Pomodoros.vue";
+// TODO: think about instead of using store for activeTodo add it to the todo props
+// and timer should be in a global store because other components rely on if timer is running or not
+const activeTodoStore = useActiveTodoStore()
 
 // Async CircleProgress component
 const circleProgress = defineAsyncComponent(() =>
   import('../CircleProgress.vue')
 )
-const activeTodoStore = useActiveTodoStore();
 
-let pomodorosIntervalId: ReturnType<typeof setInterval>;
-let counter = ref(0);
-let staticCounterValue = ref(0);
-let counterCompletedSteps = ref(counter.value);
+const timerState = computed(() => {
+  return useTimer({
+    seconds: activeTodoStore.activeTodo.pomodoros.inSeconds,
+    step: 1,
+    completedSeconds: activeTodoStore.activeTodo.pomodoros.completedInSeconds
+  })
+})
 
-const prettyTime = computed<string>(() => {
-  const minutes = Math.floor(counter.value / 60);
-  const seconds = counter.value % 60;
+const timerActions = (event: Event) => {
+  event.preventDefault() // just in there will be <a> or something else
 
-  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-});
+  if (activeTodoStore.activeTodo.done) return
+  const target = event.target as HTMLButtonElement
 
-activeTodoStore.$subscribe(() => {
-  let pomodoros = activeTodoStore.activeTodo?.pomodoros ?? 0;
-  // TODO: change to *25*60
-  counter.value = pomodoros * 25 * 60;
-  staticCounterValue.value = counter.value;
-});
-
-const startTimer = (target: HTMLButtonElement) => {
-  target.dataset.action = "stopTimer"
-  target.textContent = "Stop"
-  pomodorosIntervalId = setInterval(() => {
-    if (counter.value > 0) {
-      counter.value -= 1;
-      counterCompletedSteps.value = staticCounterValue.value - counter.value;
-    } else {
-      stopTimer(target);
-    }
-  }, 1000)
-}
-
-const stopTimer = (target: HTMLButtonElement) => {
-  target.dataset.action = "startTimer"
-  target.textContent = "Start"
-
-  clearInterval(pomodorosIntervalId)
-}
-
-const toggleTimer = (event: Event) => {
-  const target: HTMLButtonElement = event.target as HTMLButtonElement;
-  if (target.dataset.action === "stopTimer") {
-    stopTimer(target);
-  } else if (target.dataset.action === "startTimer") {
-    startTimer(target);
+  switch (target.dataset.action) {
+    case 'startTimer':
+      timerState.value.startTimer()
+      break
+    case 'stopTimer':
+      timerState.value.stopTimer()
+      break
+    case 'resetTimer':
+      timerState.value.resetTimer()
+      break
   }
 };
+
+// Need this to remove qoutes from a ComputedRef<string> returned from useTimer
+const prettyTime = computed(() => timerState.value.prettyTime.value)
 </script>
 
 <template>
   <div class="timer">
-    <circle-progress :diameter="500" :segments="activeTodoStore.activeTodo.pomodoros">
-      <div class="timer-content">
-        <h4 class="timer-title">
-          <template v-if="activeTodoStore.activeTodo.text">
-            {{ activeTodoStore.activeTodo.text }}
-          </template>
-          <template v-else>
-            Plan Your Task!
-          </template>
-        </h4>
+    <circle-progress :diameter="500" :segments="activeTodoStore.activeTodo.pomodoros.count" :compleded-value="timerState.timer.completedSeconds"
+      :value="timerState.timer.seconds">
+      <div class="timer-content" @click="timerActions($event)">
         <time>{{ prettyTime }}</time>
-        <Pomodoros :pomodoros="activeTodoStore.activeTodo.pomodoros" />
-        <button type="button" class="timer-btn" data-action="startTimer" @click="toggleTimer($event)">Start</button>
+        <Pomodoros :pomodorosCount="activeTodoStore.activeTodo.pomodoros.count" />
+        <template v-if="!timerState.timer.isRunning">
+          <button type="button" class="timer-btn btn--asLink" data-action="startTimer">Start</button>
+        </template>
+        <template v-else>
+          <button type="button" class="timer-btn btn--asLink" data-action="stopTimer">Stop</button>
+        </template>
+        <button type="button" class="reset-btn btn--asLink" data-action="resetTimer">Reset</button>
       </div>
     </circle-progress>
   </div>
@@ -104,13 +88,6 @@ const toggleTimer = (event: Event) => {
   height: 80%;
 }
 
-.timer-title {
-  flex: 1 0 100%;
-  font-size: 2em;
-  margin-top: 0;
-  margin-bottom: var(--t-paddings);
-}
-
 .pomodoros {
   flex: 1 0 100%;
   justify-content: center;
@@ -130,5 +107,13 @@ const toggleTimer = (event: Event) => {
 
 .timer-btn {
   margin-top: 40px;
+  margin-right: 10px;
+  font-size: 26px;
+}
+
+.reset-btn {
+  margin-top: 40px;
+  margin-left: 10px;
+  font-size: 26px;
 }
 </style>

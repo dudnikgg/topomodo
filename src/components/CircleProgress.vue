@@ -8,8 +8,9 @@ interface Settings {
   animationDuration?: number;
   gap?: number; // gap between segments
   segments?: number; // number of segments
-  step?: number; // miliseconds
-  completedSteps?: number;
+  stepValue?: number; // seconds per step
+  value?: number; // initial value
+  complededValue?: number; // completed value
 }
 
 const settings = withDefaults(defineProps<Settings>(), {
@@ -19,41 +20,48 @@ const settings = withDefaults(defineProps<Settings>(), {
   strokeActiveColor: "#ff4a44",
   animationDuration: 1000,
   gap: 10,
-  segments: 0,
-  step: 1000,
-  completedSteps: 0,
+  segments: 1,
+  stepValue: 0,
+  value: 0,
+  complededValue: 0,
 })
 
 const canvasElem = ref<HTMLCanvasElement>();
 let ctx: CanvasRenderingContext2D | null;
 
-// TODO: should be in a timer component
-// const int = setInterval(() => {
-//   test.value = test.value + 1/60
-//   console.log(test.value);
-// }, 1000)
-
-// Settings
+const roundedPI: number = Number(Math.PI.toFixed(3)) // 3.142 to be more precise
+// need to draw the circle in the middle of the canvas
 const gap = computed(() => settings.gap + settings.strokeWidth);
 const radius = computed(() => settings.diameter / 2);
-const circumference = computed(() => 2 * Math.PI * radius.value);
+const circumference = computed(() => roundedPI * settings.diameter);
 const segmentLength = computed(() => {
-  if (settings.segments <= 1) return 0;
-  return circumference.value / settings.segments - gap.value
+  if (settings.segments > 1) {
+    return (circumference.value - gap.value * settings.segments) / settings.segments
+  }
 });
-const t = computed(() => ((Math.PI / 180) * -90) / settings.segments); // TODO: ??? -> change name : it is probably a 'step' check ipadnotes
 
-const drawInitCircle = (ctx: CanvasRenderingContext2D, tick: number = 0) => {
+// need to count completed steps
+const completedValueAsPercentDegrees = computed(() => {
+  return (360 / settings.value) * settings.complededValue;
+});
+
+const drawTimer = (ctx: CanvasRenderingContext2D) => {
+
+  // TODO: completed value as pices need to be set in arc() as a coordinate of an end angle point, check arc function
   ctx.clearRect(0, 0, settings.diameter + gap.value, settings.diameter + gap.value); // clear previous drawn content
-  ctx.setTransform(1, 0, 0, 1, radius.value + gap.value / 2, radius.value + gap.value / 2); // translate to center
-  ctx.rotate(-90 * (Math.PI / 180)); // rotate -90deg
+
+  // translates are for the circle to be in the middle of the canvas, on init and after rotation
+  const posXandY = (settings.diameter + gap.value) / 2;
+  ctx.translate(posXandY, posXandY);
+  ctx.rotate(-90 * (roundedPI / 180)); // rotate 90deg so we start drawind form the top (0deg)
+  ctx.translate(-posXandY, -posXandY);
 
   ctx.beginPath();
-  ctx.arc(0, 0, radius.value, 0, Math.PI * 2);
-  if (segmentLength.value > 0) {
+  ctx.arc(posXandY, posXandY, radius.value, 0, roundedPI * 2);
+  if (segmentLength.value) {
     ctx.setLineDash([segmentLength.value, gap.value]);
   }
-  ctx.lineDashOffset = -gap * 0.5;
+  ctx.lineDashOffset = -gap.value * 0.5;
   ctx.lineWidth = settings.strokeWidth;
   ctx.lineCap = "butt";
   ctx.strokeStyle = settings.strokeColor;
@@ -61,7 +69,7 @@ const drawInitCircle = (ctx: CanvasRenderingContext2D, tick: number = 0) => {
 
   ctx.beginPath();
   // TODO: add step and stepSize support
-  ctx.arc(0, 0, radius.value, 0, Math.PI * 2 * tick);
+  ctx.arc(posXandY, posXandY, radius.value, 0, (roundedPI / 180) * completedValueAsPercentDegrees.value);
   ctx.strokeStyle = settings.strokeActiveColor;
   ctx.stroke();
 
@@ -72,13 +80,13 @@ const drawInitCircle = (ctx: CanvasRenderingContext2D, tick: number = 0) => {
 onMounted(() => {
   ctx = canvasElem.value!.getContext("2d"); // ! - is a non-null assertion operator (typescript)
   if (ctx) {
-    drawInitCircle(ctx);
+    drawTimer(ctx);
   }
 })
 
 onBeforeUpdate(() => {
   if (ctx) {
-    drawInitCircle(ctx, t.value);
+    drawTimer(ctx);
   }
 })
 

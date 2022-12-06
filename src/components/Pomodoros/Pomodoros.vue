@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
 import { MAX_POMODOROS } from '@/types/TodoItem'
 
-const { pomodoros } = defineProps<{
-  pomodoros: number | undefined
+const { pomodorosCount } = defineProps<{
+  pomodorosCount: number | undefined
 }>()
 
 const emit = defineEmits<{
@@ -20,8 +19,8 @@ const emitOnMouseout = () => { emit('onMouseout') }
 <template>
   <div class="pomodoros" @mouseout="emitOnMouseout">
     <div class="pomodoros-list">
-      <button type="button" class="pomodoros-item" v-for="index in MAX_POMODOROS" :key="index + 1" @mouseover="emitOnMouseover(index)" @click="emitSetPomodoros(index)">
-        <svg :class="{ 'js-checked': pomodoros && pomodoros >= index }">
+      <button type="button" class="pomodoros-item" v-for="index in MAX_POMODOROS" :key="index + 1" @mouseover="emitOnMouseover(index)" @click.stop="emitSetPomodoros(index)">
+        <svg :class="{ 'js-checked': pomodorosCount && pomodorosCount >= index }">
           <use xlink:href="/tomato.svg#tomato" />
         </svg>
       </button>

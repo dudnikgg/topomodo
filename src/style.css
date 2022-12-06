@@ -7,7 +7,7 @@
   --t-dark-grey: #414558;
   --t-dark-cyan: #80ffea;
   --t-dark-green: #8aff80;
-  ---dark-pink: #ff80be;
+  --t-dark-pink: #ff80be;
   --t-dark-red: #ff9580;
   --t-dark-yellow: #ffff80;
   --t-dark-cyan-green: linear-gradient(
@@ -31,6 +31,10 @@
 
   /* transion for elements */
   --t-transition: all 250ms cubibezier(0.4, 0, 0.23, 1);
+
+  /* Links (and buttons as links) */
+  --t-link-color: var(--t-dark-white);
+  --t-link-color--hover: var(--t-dark-red);
 }
 
 /* Base */
@@ -83,11 +87,11 @@ h4 {
 
 a {
   font-weight: 500;
-  color: var(--t-dark-cyan);
+  color: var(--t-link-color);
   text-decoration: inherit;
 }
 a:hover {
-  color: var(--t-dark-green);
+  color: var(--t-link-color--hover);
 }
 
 input:not([type="checkbox"]),
@@ -130,6 +134,18 @@ button:hover,
   border-color: var(--t-dark-green);
 }
 
+.btn--asLink {
+  color: var(--t-link-color);
+  border: none;
+  outline: none;
+  background: none;
+}
+
+.btn--asLink:hover {
+  color: var(--t-link-color--hover);
+  text-decoration: underline;
+}
+
 input[type="checkbox"] {
   display: none;
 }
@@ -165,7 +181,7 @@ input[type="checkbox"]:focus + label {
 
 input[type="checkbox"] + label:hover > span,
 input[type="checkbox"]:focus + label > span {
-  background: var(--t-dark-grey);
+  border-color: var(--t-dark-white);
 }
 
 input[type="checkbox"].js-checked + label {
