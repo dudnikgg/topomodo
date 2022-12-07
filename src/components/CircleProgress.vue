@@ -47,7 +47,6 @@ const completedValueAsPercentDegrees = computed(() => {
 
 const drawTimer = (ctx: CanvasRenderingContext2D) => {
 
-  // TODO: completed value as pices need to be set in arc() as a coordinate of an end angle point, check arc function
   ctx.clearRect(0, 0, settings.diameter + gap.value, settings.diameter + gap.value); // clear previous drawn content
 
   // translates are for the circle to be in the middle of the canvas, on init and after rotation

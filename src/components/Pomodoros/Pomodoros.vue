@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { MAX_POMODOROS } from '@/types/TodoItem'
+import { MAX_POMODOROS } from '@/helpers/constants'
 
 const { pomodorosCount } = defineProps<{
   pomodorosCount: number | undefined

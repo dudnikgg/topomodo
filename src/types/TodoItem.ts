@@ -1,12 +1,13 @@
+export interface IPomodoros {
+  count: number
+  inSeconds: number
+  completedInSeconds: number
+}
+
 export interface ITodoItem {
   id: string
   text: string
   done: boolean
-  pomodoros: {
-    count: number,
-    inSeconds: number,
-    completedInSeconds: number,
-  }
+  selected: boolean
+  pomodoros: IPomodoros
 }
-
-export const MAX_POMODOROS = 5

@@ -1,70 +1,67 @@
+import { computed, reactive } from "vue"
 import { defineStore } from "pinia"
 import type { ITodoItem } from "@/types/TodoItem"
-import uniqeId from "uniqid"
+import TodoItemFactory from "@/helpers/createTodoFactory"
 
-const useTodoStore = defineStore("todoStore", {
-  state: () => ({
-    todos: [
-      {
-        id: uniqeId(),
-        text: "TODO 1",
-        done: false,
-        pomodoros: {
-          count: 4,
-          inSeconds: 6000,
-          completedInSeconds: 0,
-        },
-      },
-      {
-        id: uniqeId(),
-        text: "TODO 2",
-        done: true,
-        pomodoros: {
-          count: 4,
-          inSeconds: 6000,
-          completedInSeconds: 0,
-        },
-      },
-      {
-        id: uniqeId(),
-        text: "TODO 3",
-        done: false,
-        pomodoros: {
-          count: 4,
-          inSeconds: 6000,
-          completedInSeconds: 0,
-        },
-      },
-    ] as Array<ITodoItem>,
-  }),
+const FAKE_TODO_ITEMS = [
+  TodoItemFactory.makeTodoItem("Buy milk"),
+  TodoItemFactory.makeTodoItem("Buy bread"),
+  TodoItemFactory.makeTodoItem("Buy eggs"),
+]
 
-  getters: {
-    completedTodos(): Array<ITodoItem> {
-      return this.todos.filter((todo) => todo.done)
-    },
-  },
+const useTodoStore = defineStore("todoStore", () => {
+  // Fake todo item to show circle timer when there are no todos
+  // maybe it should be reference for active todo from todos array
+  let state = reactive({ todos: FAKE_TODO_ITEMS })
 
-  actions: {
-    addTodoItem(todo: ITodoItem) {
-      this.todos.push(todo)
-    },
+  const completedTodos = computed(() => state.todos.filter((todo) => todo.done))
+  const activeTodo = computed(
+    () =>
+      state.todos.filter((todo) => todo.selected)[0] ??
+      TodoItemFactory.makeTodoItem("")
+  )
 
-    removeTodoItem(id: string) {
-      this.todos = this.todos.filter((todo) => todo.id !== id)
-    },
+  const addTodoItem = (text: ITodoItem["text"]) =>
+    state.todos.push(TodoItemFactory.makeTodoItem(text))
 
-    toggleTodoItemStatus(id: string, isDone: boolean) {
-      const index = this.todos.findIndex((todo) => todo.id === id)
-      this.todos[index].done = isDone
-    },
+  const removeTodoItem = (id: string) => {
+    state.todos = state.todos.filter((todo) => todo.id !== id)
+  }
 
-    setPomodorosTodoItem(id: string, pomodoros: number) {
-      const index = this.todos.findIndex((todo) => todo.id === id)
-      this.todos[index].pomodoros.count = pomodoros
-      // TODO: * 25 * 60
-      this.todos[index].pomodoros.inSeconds = pomodoros + 10
-    },
-  },
+  const toggleTodoItemStatus = (id: string, isDone: boolean) => {
+    if(activeTodo.value.id === id) activeTodo.value.selected = false
+    const index = state.todos.findIndex((todo) => todo.id === id)
+    state.todos[index].done = isDone
+  }
+
+  const setPomodorosTodoItem = (id: string, pomodoros: number) => {
+    const index = state.todos.findIndex((todo) => todo.id === id)
+    state.todos[index].pomodoros.count = pomodoros
+    state.todos[index].pomodoros.inSeconds = pomodoros * 25 * 60
+  }
+
+  const toggleActiveTodoItem = (todoId: ITodoItem["id"]) => {
+    const index = state.todos.findIndex((todo) => todo.id === todoId)
+    if (state.todos[index].done) return
+
+    if (state.todos[index].id === activeTodo.value.id) {
+      state.todos[index].selected = false
+    } else {
+      activeTodo.value.selected = false
+      state.todos[index].selected = true
+    }
+  }
+
+  return {
+    state,
+    completedTodos,
+    activeTodo,
+    addTodoItem,
+    removeTodoItem,
+    toggleActiveTodoItem,
+    toggleTodoItemStatus,
+    setPomodorosTodoItem,
+  }
 })
 
 export { useTodoStore }

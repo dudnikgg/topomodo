@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useTodoStore } from '@/stores/TodoStore';
-import useTimer from "@/composables/useTimer";
-import { useActiveTodoStore } from '@/stores/ActiveTodoStore';
 import type { ITodoItem } from '@/types/TodoItem'
 import Pomodoros from '@/components/Pomodoros/Pomodoros.vue'
 const { todo } = defineProps<{
@@ -10,8 +8,7 @@ const { todo } = defineProps<{
 }>()
 
 const todoStore = useTodoStore();
-const activeTodoStore = useActiveTodoStore();
-const todoRef = ref()
+const todoRef = ref() // refference to the todo item in HTML
 
 const pomodorosOnMouseover = (hoveredPomodoros: number) => {
     todoRef.value.querySelectorAll(".pomodoros-item > svg").forEach((pomodoroItem: HTMLElement, index: number) => {
@@ -28,14 +25,18 @@ const pomodorosOnMouseout = () => {
         pomodoroItem.classList.remove('js-hovered')
     })
 }
+
+const onTodoItemClick = () => {
+    todoStore.toggleActiveTodoItem(todo.id)
+}
 </script>
 
 <template>
-    <div class="todo-item" ref="todoRef" :class="{ 'js-active': activeTodoStore.activeTodo.id === todo.id }" @click="activeTodoStore.toggleActiveTodoItem($event, todo)">
+    <div class="todo-item" ref="todoRef" :class="{ 'js-active': todoStore.activeTodo.id === todo.id }" @click="onTodoItemClick">
         <div class="l-inner">
             <div class="l-todo-top">
                 <div class="l-wrapper">
-                    <input type="checkbox" :id="`todoCheckbox-${todo.id}`" @click="todoStore.toggleTodoItemStatus(todo.id, !todo.done)"
+                    <input type="checkbox" :id="`todoCheckbox-${todo.id}`" @change="todoStore.toggleTodoItemStatus(todo.id, !todo.done)"
                         :class="{ 'js-checked': todo.done }" data-test="toggleTodo" />
                     <label :for='`todoCheckbox-${todo.id}`' class="todo-text">
                         <span></span>
@@ -43,7 +44,7 @@ const pomodorosOnMouseout = () => {
                     </label>
                 </div>
             </div>
-            <div class="l-todo-bottom" :class="{ 'is-disabled': activeTodoStore.activeTodo.id === todo.id || todo.done }">
+            <div class="l-todo-bottom" :class="{ 'is-disabled': todoStore.activeTodo.id === todo.id || todo.done }">
                 <div class="todo-date">
                     <button type="button" class="todo-estimate btn--asLink">Estimate</button>
                 </div>
